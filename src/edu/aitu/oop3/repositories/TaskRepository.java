@@ -13,3 +13,4 @@ public interface TaskRepository {
     void updateStatus(long taskId, String newStatus);
     void delete(long id);
 }
+// 1

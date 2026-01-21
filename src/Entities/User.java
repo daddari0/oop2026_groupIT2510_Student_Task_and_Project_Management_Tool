@@ -14,7 +14,24 @@ public class User {
         this.id = idgen++;
         setName(name);
         setSurname(surname);
-        setEmail(email)
+        setEmail(email);
+        setPhoneNumber(phoneNumber);
+        setGender(gender);
+        setStatus(status);
 
+    }
+    public int getId(){
+        return id;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public void setName(String name){
+        if(name == null || name.isEmpty()){
+            throw new IllegalArgumentException("Name is null.");
+        }
+        this.name = name;
     }
 }

@@ -7,7 +7,17 @@ public class Comment {
     private User author;
     private Task task;
 
+    public Comment() {
+    }
+
     public Comment(int id, String content, User author, Task task) {
+        this.id = id;
+        setContent(content);
+        setAuthor(author);
+        setTask(task);
+    }
+
+    public Comment(String content, User author, Task task) {
         this.id = idgen++;
         setContent(content);
         setAuthor(author);
@@ -16,6 +26,10 @@ public class Comment {
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getContent() {

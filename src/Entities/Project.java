@@ -1,21 +1,42 @@
 package Entities;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 public class Project {
-    private int id;
-    private static int idgen;
+    private long id;
+    private static long idgen;
     private String name;
     private String description;
     private String status;
 
-    public Project(int id, String name, String description, String status) {
+    private Long ownerId;
+    private LocalDate deadline;
+    private LocalDateTime createdAt;
+
+    public Project() {
+    }
+
+    public Project(long id, String name, String description, String status) {
+        this.id = id;
+        setName(name);
+        setDescription(description);
+        setStatus(status);
+    }
+
+    public Project(String name, String description, String status) {
         this.id = idgen++;
         setName(name);
         setDescription(description);
         setStatus(status);
     }
 
-    public int getId() {
+    public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -49,5 +70,29 @@ public class Project {
             throw new IllegalArgumentException("Status is null.");
         }
         this.status = status;
+    }
+
+    public Long getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public LocalDate getDeadline() {
+        return deadline;
+    }
+
+    public void setDeadline(LocalDate deadline) {
+        this.deadline = deadline;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

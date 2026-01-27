@@ -15,9 +15,10 @@ public class CommentRepositoryImpl implements CommentRepository {
     @Override
     public Comment create(Comment comment) {
         String sql = """
-            INSERT INTO comments (task_id, author_id, text)
-            VALUES (?, ?, ?)
-            """;
+        INSERT INTO comments (task_id, author_id, text)
+        VALUES (?, ?, ?)
+        RETURNING id
+        """;
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -26,12 +27,16 @@ public class CommentRepositoryImpl implements CommentRepository {
             ps.setLong(2, comment.getAuthor().getId());
             ps.setString(3, comment.getContent());
 
-            ps.executeUpdate();
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                comment.setId(rs.getInt("id"));
+            }
             return comment;
         } catch (SQLException e) {
             throw new RuntimeException("Error creating comment", e);
         }
     }
+
 
     @Override
     public Optional<Comment> findById(Long id) {

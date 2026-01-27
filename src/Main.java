@@ -1,3 +1,5 @@
+import Entities.Comment;
+import Services.CommentService;
 import edu.aitu.oop3.db.DatabaseConnection;
 import Entities.Project;
 import Entities.Task;
@@ -5,9 +7,8 @@ import Entities.User;
 import Services.ProjectService;
 import Services.TaskService;
 import Services.UserService;
-import repositories.ProjectRepository;
-import repositories.TaskRepository;
-import repositories.UserRepository;
+import repositories.*;
+import repositories.CommentRepositoryImpl;
 import repositories.Implements.ProjectRepositoryImpl;
 import repositories.Implements.TaskRepositoryImpl;
 import repositories.Implements.UserRepositoryImpl;
@@ -39,10 +40,12 @@ public class Main {
         UserRepository userRepo = new UserRepositoryImpl();
         ProjectRepository projectRepo = new ProjectRepositoryImpl();
         TaskRepository taskRepo = new TaskRepositoryImpl();
+        CommentRepository commentRepo = new CommentRepositoryImpl();
 
         UserService userService = new UserService(userRepo);
         ProjectService projectService = new ProjectService(projectRepo);
         TaskService taskService = new TaskService(taskRepo, projectRepo, userRepo);
+        CommentService commentService = new CommentService(commentRepo, taskRepo, userRepo);
 
         User user = userService.createUser("Abay", "abay@example.com");
         System.out.println("User created: " + user.getId());
@@ -68,6 +71,13 @@ public class Main {
 
         taskService.changeStatus(task.getId(), "IN_PROGRESS");
         System.out.println("Task status changed.");
+
+        Comment comment = commentService.createComment(
+                task.getId(),
+                user.getId(),
+                "Looks good!"
+        );
+        System.out.println("Comment created: " + comment.getId());
     }
 
 }

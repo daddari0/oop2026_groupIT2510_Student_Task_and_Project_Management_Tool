@@ -1,8 +1,9 @@
 package Services;
 
-import Entities.Project;
+import Config.SettingsManager;
+import Services.TaskFilter;
 import Entities.Task;
-import Entities.User;
+import Entities.TaskType;
 import Exceptions.DeadlineInThePast;
 import Exceptions.InvalidStatusTransition;
 import Exceptions.TaskWithoutProject;
@@ -12,6 +13,7 @@ import repositories.UserRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TaskService {
 
@@ -27,23 +29,27 @@ public class TaskService {
         this.userRepository = userRepository;
     }
 
-    public Task createTask(Long projectId,
+    public Task createTask(TaskType type,
+                           Long projectId,
                            Long assigneeId,
                            String title,
                            String description,
                            String status,
                            LocalDate deadline) {
 
+        if (status == null || status.isBlank()) {
+            status = SettingsManager.getInstance().getDefaultTaskStatus();
+        }
+
         if (projectId == null) {
             throw new TaskWithoutProject();
         }
 
-        Project project = projectRepository.findById(projectId)
+        projectRepository.findById(projectId)
                 .orElseThrow(TaskWithoutProject::new);
 
-        User assignee = null;
         if (assigneeId != null) {
-            assignee = userRepository.findById(assigneeId)
+            userRepository.findById(assigneeId)
                     .orElseThrow(() -> new IllegalArgumentException("Assignee not found: " + assigneeId));
         }
 
@@ -51,7 +57,9 @@ public class TaskService {
             throw new DeadlineInThePast();
         }
 
-        Task task = new Task(title, description, status, assignee, project);
+        Task task = TaskFactory.createTask(
+                type, projectId, assigneeId, title, description, status, deadline
+        );
         return taskRepository.create(task);
     }
 
@@ -88,5 +96,11 @@ public class TaskService {
 
     public List<Task> getAllTasks() {
         return taskRepository.findAll();
+    }
+
+    public List<Task> filterTasks(TaskFilter filter) {
+        return taskRepository.findAll().stream()
+                .filter(filter::matches)
+                .collect(Collectors.toList());
     }
 }

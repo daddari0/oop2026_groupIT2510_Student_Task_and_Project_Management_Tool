@@ -25,12 +25,13 @@ public class ProjectService {
             throw new DeadlineInThePast();
         }
 
-        Project p = new Project();
-        p.setName(name);
-        p.setDescription(description);
-        p.setStatus(status);
-        p.setOwnerId(ownerId);
-        p.setDeadline(deadline);
+        Project p = new Project.Builder()
+                .name(name)
+                .description(description)
+                .status(status)
+                .ownerId(ownerId)
+                .deadline(deadline)
+                .build();
 
         return projectRepository.create(p);
     }

@@ -95,4 +95,61 @@ public class Project {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+    private Project(Builder builder) {
+        this.name = builder.name;
+        this.description = builder.description;
+        this.status = builder.status;
+        this.ownerId = builder.ownerId;
+        this.deadline = builder.deadline;
+        this.createdAt = builder.createdAt;
+    }
+
+    public static class Builder {
+        private String name;
+        private String description;
+        private String status;
+        private Long ownerId;
+        private LocalDate deadline;
+        private LocalDateTime createdAt;
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder status(String status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder ownerId(Long ownerId) {
+            this.ownerId = ownerId;
+            return this;
+        }
+
+        public Builder deadline(LocalDate deadline) {
+            this.deadline = deadline;
+            return this;
+        }
+
+        public Builder createdAt(LocalDateTime createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
+        public Project build() {
+            if (name == null || name.isBlank()) {
+                throw new IllegalArgumentException("Project name is required");
+            }
+            if (status == null || status.isBlank()) {
+                status = "ACTIVE";
+            }
+            return new Project(this);
+        }
+    }
 }

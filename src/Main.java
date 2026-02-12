@@ -2,6 +2,7 @@ import Config.NotificationCenter;
 import Config.SettingsManager;
 import Entities.*;
 import Services.*;
+import components.*;
 import edu.aitu.oop3.db.DatabaseConnection;
 import repositories.*;
 import repositories.CommentRepositoryImpl;
@@ -43,13 +44,22 @@ public class Main {
         TaskService taskService = new TaskService(taskRepo, projectRepo, userRepo);
         CommentService commentService = new CommentService(commentRepo, taskRepo, userRepo);
 
+        ProjectManagementComponent projectComponent =
+                new ProjectManagementComponentImpl(projectService);
+
+        TaskTrackingComponent taskComponent =
+                new TaskTrackingComponentImpl(taskService);
+
+        NotificationComponent notificationComponent =
+                new NotificationComponentImpl(NotificationCenter.getInstance());
+
         SettingsManager settings = SettingsManager.getInstance();
         settings.setDefaultTaskStatus("TODO");
 
         User user = userService.createUser("Abay", "abay@example.com");
         System.out.println("User created: " + user.getId());
 
-        Project project = projectService.createProject(
+        Project project = projectComponent.createProject(
                 "New Project",
                 "123",
                 "ACTIVE",
@@ -58,7 +68,7 @@ public class Main {
         );
         System.out.println("Project created: " + project.getId());
 
-        Task task = taskService.createTask(
+        Task task = taskComponent.createTask(
                 TaskType.BUG,
                 project.getId(),
                 user.getId(),
@@ -69,13 +79,12 @@ public class Main {
         );
         System.out.println("Task created: " + task.getId());
 
-        NotificationCenter center = NotificationCenter.getInstance();
-        center.subscribe(msg -> System.out.println("NOTIFICATION: " + msg));
-        center.notifyAll("Task created: " + task.getTitle());
+        notificationComponent.subscribe(msg -> System.out.println("NOTIFICATION: " + msg));
+        notificationComponent.notify("Task created: " + task.getTitle());
 
-        taskService.changeStatus(task.getId(), "IN_PROGRESS");
+        taskComponent.changeStatus(task.getId(), "IN_PROGRESS");
         System.out.println("Task status changed to IN_PROGRESS.");
-        taskService.changeStatus(task.getId(), "DONE");
+        taskComponent.changeStatus(task.getId(), "DONE");
         System.out.println("Task status changed to DONE.");
 
         Comment comment = commentService.createComment(
@@ -85,14 +94,14 @@ public class Main {
         );
         System.out.println("Comment created: " + comment.getId());
 
-        var overdueTasks = taskService.filterTasks(
+        var overdueTasks = taskComponent.filterTasks(
                 t -> t.getDeadline() != null
                         && t.getDeadline().isBefore(LocalDate.now())
                         && !"DONE".equals(t.getStatus())
         );
         System.out.println("Overdue tasks count: " + overdueTasks.size());
 
-        var inProgress = taskService.filterTasks(
+        var inProgress = taskComponent.filterTasks(
                 t -> "IN_PROGRESS".equals(t.getStatus())
         );
         System.out.println("In progress tasks: " + inProgress.size());
